@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¿Quién quiere ser millonario?</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            font-family: Arial, Helvetica, sans-serif;
+            background:
+                radial-gradient(circle at center, #243b8f 0%, #10194d 45%, #050822 100%);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .game {
+            width: 100%;
+            max-width: 1100px;
+            min-height: 650px;
+            background: rgba(5, 8, 34, 0.94);
+            border: 2px solid #d4af37;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 0 40px rgba(212, 175, 55, 0.35);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            color: #ffd700;
+            font-size: clamp(28px, 5vw, 48px);
+            text-shadow: 0 0 15px #ffd700;
+        }
+
+        .header p {
+            margin-top: 8px;
+            color: #ddd;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 1fr 260px;
+            gap: 25px;
+        }
+
+        .question-area {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .level {
+            text-align: center;
+            color: #ffd700;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .question {
+            background: linear-gradient(135deg, #111b5e, #1e2c82);
+            border: 2px solid #aaa;
+            border-radius: 15px;
+            padding: 30px 20px;
+            text-align: center;
+            font-size: clamp(20px, 3vw, 28px);
+            font-weight: bold;
+            margin-bottom: 25px;
+            min-height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .answers {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .answer {
+            min-height: 70px;
+            padding: 15px;
+            border-radius: 12px;
+            border: 2px solid #999;
+            background: linear-gradient(135deg, #17256c, #263a9d);
+            color: white;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            transition: 0.25s;
+        }
+
+        .answer:hover:not(:disabled) {
+            transform: scale(1.03);
+            border-color: #ffd700;
+            background: linear-gradient(135deg, #253a9d, #3852c5);
+        }
+
+        .answer:disabled {
+            cursor: default;
+        }
+
+        .correct {
+            background: #138a3d !important;
+            border-color: #55ff8a !important;
+        }
+
+        .incorrect {
+            background: #a71919 !important;
+            border-color: #ff6666 !important;
+        }
+
+        .money {
+            background: rgba(15, 20, 70, 0.95);
+            border: 2px solid #d4af37;
+            border-radius: 15px;
+            padding: 15px;
+        }
+
+        .money h2 {
+            text-align: center;
+            color: #ffd700;
+            margin-bottom: 12px;
+        }
+
+        .money-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .money-list li {
+            padding: 8px 12px;
+            border-radius: 7px;
+            color: #eee;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .money-list li:nth-child(odd) {
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .money-list .current {
+            background: #d4af37;
+            color: #111;
+            font-weight: bold;
+            transform: scale(1.05);
+        }
+
+        .money-list .completed {
+            color: #55ff8a;
+        }
+
+        .difficulty {
+            display: inline-block;
+            margin-bottom: 12px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: #222;
+            color: #ffd700;
+            font-weight: bold;
+        }
+
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            padding: 12px 22px;
+            border: none;
+            border-radius: 10px;
+            background: #d4af37;
+            color: #111;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .control-btn:hover {
+            background: #ffd700;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .start-screen,
+        .end-screen {
+            text-align: center;
+            padding: 50px 20px;
+        }
+
+        .start-screen h2,
+        .end-screen h2 {
+            color: #ffd700;
+            font-size: 38px;
+            margin-bottom: 20px;
+        }
+
+        .start-screen p,
+        .end-screen p {
+            font-size: 19px;
+            line-height: 1.6;
+            color: #ddd;
+            max-width: 700px;
+            margin: 0 auto 25px;
+        }
+
+        .start-btn {
+            padding: 16px 40px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #ffd700, #c99800);
+            color: #111;
+            font-size: 22px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.35);
+        }
+
+        .start-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .final-money {
+            color: #55ff8a;
+            font-size: 34px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .warning {
+            margin-top: 15px;
+            color: #ff7777;
+            font-size: 14px;
+        }
+
+        @media (max-width: 800px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+
+            .money {
+                order: -1;
+            }
+
+            .money-list {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 550px) {
+            .game {
+                padding: 15px;
+            }
+
+            .answers {
+                grid-template-columns: 1fr;
+            }
+
+            .money-list {
+                grid-template-columns: 1fr;
+            }
+
+            .question {
+                padding: 20px 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="game">
+
+    <!-- PANTALLA INICIAL -->
+    <div id="startScreen" class="start-screen">
+        <div class="header">
+            <h1>¿QUIÉN QUIERE SER MILLONARIO?</h1>
+        </div>
+
+        <h2>¡Pon a prueba tus conocimientos!</h2>
+
+        <p>
+            Responde correctamente 20 preguntas de cultura general.
+            Cada dos preguntas aumenta la dificultad y también el premio.
+        </p>
+
+        <p>
+            ⚠️ <strong>¡Cuidado!</strong> Si respondes incorrectamente,
+            perderás todo el dinero acumulado.
+        </p>
+
+        <button class="start-btn" onclick="startGame()">
+            COMENZAR
+        </button>
+    </div>
+
+
+    <!-- JUEGO -->
+    <div id="gameScreen" class="hidden">
+
+        <div class="header">
+            <h1>¿QUIÉN QUIERE SER MILLONARIO?</h1>
+        </div>
+
+        <div class="layout">
+
+            <div class="question-area">
+
+                <div class="level">
+                    Pregunta <span id="questionNumber">1</span> de 20
+                </div>
+
+                <div style="text-align:center;">
+                    <span id="difficulty" class="difficulty">
+                        Fácil
+                    </span>
+                </div>
+
+                <div id="question" class="question">
+                    Pregunta
+                </div>
+
+                <div id="answers" class="answers">
+                    <!-- Respuestas generadas por JavaScript -->
+                </div>
+
+                <div class="controls">
+                    <button class="control-btn" onclick="retire()">
+                        💰 Retirarme
+                    </button>
+                </div>
+
+                <div class="warning">
+                    Si te equivocas, perderás todo tu dinero acumulado.
+                </div>
+
+            </div>
+
+
+            <!-- ESCALA DE PREMIOS -->
+            <div class="money">
+
+                <h2>PREMIOS</h2>
+
+                <ul id="moneyList" class="money-list">
+
+                    <li data-level="20">
+                        <span>20</span>
+                        <span>$1.000.000</span>
+                    </li>
+
+                    <li data-level="19">
+                        <span>19</span>
+                        <span>$900.000</span>
+                    </li>
+
+                    <li data-level="18">
+                        <span>18</span>
+                        <span>$800.000</span>
+                    </li>
+
+                    <li data-level="17">
+                        <span>17</span>
+                        <span>$700.000</span>
+                    </li>
+
+                    <li data-level="16">
+                        <span>16</span>
+                        <span>$600.000</span>
+                    </li>
+
+                    <li data-level="15">
+                        <span>15</span>
+                        <span>$500.000</span>
+                    </li>
+
+                    <li data-level="14">
+                        <span>14</span>
+                        <span>$400.000</span>
+                    </li>
+
+                    <li data-level="13">
+                        <span>13</span>
+                        <span>$350.000</span>
+                    </li>
+
+                    <li data-level="12">
+                        <span>12</span>
+                        <span>$300.000</span>
+                    </li>
+
+                    <li data-level="11">
+                        <span>11</span>
+                        <span>$250.000</span>
+                    </li>
+
+                    <li data-level="10">
+                        <span>10</span>
+                        <span>$200.000</span>
+                    </li>
+
+                    <li data-level="9">
+                        <span>9</span>
+                        <span>$150.000</span>
+                    </li>
+
+                    <li data-level="8">
+                        <span>8</span>
+                        <span>$100.000</span>
+                    </li>
+
+                    <li data-level="7">
+                        <span>7</span>
+                        <span>$80.000</span>
+                    </li>
+
+                    <li data-level="6">
+                        <span>6</span>
+                        <span>$60.000</span>
+                    </li>
+
+                    <li data-level="5">
+                        <span>5</span>
+                        <span>$40.000</span>
+                    </li>
+
+                    <li data-level="4">
+                        <span>4</span>
+                        <span>$30.000</span>
+                    </li>
+
+                    <li data-level="3">
+                        <span>3</span>
+                        <span>$20.000</span>
+                    </li>
+
+                    <li data-level="2">
+                        <span>2</span>
+                        <span>$10.000</span>
+                    </li>
+
+                    <li data-level="1">
+                        <span>1</span>
+                        <span>$5.000</span>
+                    </li>
+
+                </ul>
+
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- PANTALLA FINAL -->
+    <div id="endScreen" class="end-screen hidden">
+
+        <h2 id="endTitle">¡Fin del juego!</h2>
+
+        <p id="endMessage"></p>
+
+        <div class="final-money">
+            $<span id="finalMoney">0</span>
+        </div>
+
+        <button class="start-btn" onclick="restartGame()">
+            JUGAR DE NUEVO
+        </button>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    // =========================================================
+    // PREGUNTAS
+    // =========================================================
+
+    const questions = [
+
+        {
+            question: "¿Cuál es el planeta más cercano al Sol?",
+            answers: ["Venus", "Mercurio", "Marte", "Júpiter"],
+            correct: 1,
+            difficulty: "Fácil"
+        },
+
+        {
+            question: "¿Cuál es el océano más grande del mundo?",
+            answers: ["Atlántico", "Índico", "Pacífico", "Ártico"],
+            correct: 2,
+            difficulty: "Fácil"
+        },
+
+        {
+            question: "¿Quién pintó la Mona Lisa?",
+            answers: ["Vincent van Gogh", "Leonardo da Vinci", "Pablo Picasso", "Miguel Ángel"],
+            correct: 1,
+            difficulty: "Fácil"
+        },
+
+        {
+            question: "¿Cuál es la capital de Australia?",
+            answers: ["Sídney", "Melbourne", "Canberra", "Perth"],
+            correct: 2,
+            difficulty: "Fácil"
+        },
+
+        {
+            question: "¿Cuántos huesos tiene aproximadamente el cuerpo humano adulto?",
+            answers: ["106", "206", "306", "406"],
+            correct: 1,
+            difficulty: "Media"
+        },
+
+        {
+            question: "¿En qué año llegó el ser humano a la Luna por primera vez?",
+            answers: ["1959", "1965", "1969", "1975"],
+            correct: 2,
+            difficulty: "Media"
+        },
+
+        {
+            question: "¿Cuál es el elemento químico cuyo símbolo es Au?",
+            answers: ["Plata", "Oro", "Cobre", "Aluminio"],
+            correct: 1,
+            difficulty: "Media"
+        },
+
+        {
+            question: "¿Qué país tiene forma aproximada de bota?",
+            answers: ["España", "Italia", "Grecia", "Portugal"],
+            correct: 1,
+            difficulty: "Media"
+        },
+
+        {
+            question: "¿Quién escribió la novela 'Cien años de soledad'?",
+            answers: [
+                "Mario Vargas Llosa",
+                "Gabriel García Márquez",
+                "Julio Cortázar",
+                "Jorge Luis Borges"
+            ],
+            correct: 1,
+            difficulty: "Media"
+        },
+
+        {
+            question: "¿Cuál es el río más largo de Europa?",
+            answers: ["Danubio", "Rin", "Volga", "Támesis"],
+            correct: 2,
+            difficulty: "Media"
+        },
+
+        {
+            question: "¿Cuál es la capital de Mongolia?",
+            answers: ["Astana", "Ulán Bator", "Tashkent", "Katmandú"],
+            correct: 1,
+            difficulty: "Difícil"
+        },
+
+        {
+            question: "¿Qué científico formuló las leyes del movimiento y la gravitación universal?",
+            answers: [
+                "Albert Einstein",
+                "Galileo Galilei",
+                "Isaac Newton",
+                "Nikola Tesla"
+            ],
+            correct: 2,
+            difficulty: "Difícil"
+        },
+
+        {
+            question: "¿Cuál es el idioma con más hablantes nativos del mundo?",
+            answers: ["Inglés", "Español", "Chino mandarín", "Hindi"],
+            correct: 2,
+            difficulty: "Difícil"
+        },
+
+        {
+            question: "¿Cuál es el país más grande del mundo por superficie?",
+            answers: ["Canadá", "China", "Estados Unidos", "Rusia"],
+            correct: 3,
+            difficulty: "Difícil"
+        },
+
+        {
+            question: "¿Qué filósofo fue maestro de Alejandro Magno?",
+            answers: ["Platón", "Aristóteles", "Sócrates", "Pitágoras"],
+            correct: 1,
+            difficulty: "Difícil"
+        },
+
+        {
+            question: "¿Cuál es la unidad básica de la herencia genética?",
+            answers: ["Célula", "Cromosoma", "Gen", "Proteína"],
+            correct: 2,
+            difficulty: "Difícil"
+        },
+
+        {
+            question: "¿Qué tratado puso fin oficialmente a la Primera Guerra Mundial entre Alemania y los Aliados?",
+            answers: [
+                "Tratado de Roma",
+                "Tratado de Versalles",
+                "Tratado de París",
+                "Tratado de Utrecht"
+            ],
+            correct: 1,
+            difficulty: "Muy difícil"
+        },
+
+        {
+            question: "¿Cuál es el número atómico del carbono?",
+            answers: ["4", "6", "8", "12"],
+            correct: 1,
+            difficulty: "Muy difícil"
+        },
+
+        {
+            question: "¿Qué físico propuso el principio de incertidumbre?",
+            answers: [
+                "Max Planck",
+                "Werner Heisenberg",
+                "Erwin Schrödinger",
+                "Niels Bohr"
+            ],
+            correct: 1,
+            difficulty: "Muy difícil"
+        },
+
+        {
+            question: "¿Cuál es el nombre de la galaxia en la que se encuentra nuestro Sistema Solar?",
+            answers: [
+                "Andrómeda",
+                "Galaxia del Sombrero",
+                "Vía Láctea",
+                "Gran Nube de Magallanes"
+            ],
+            correct: 2,
+            difficulty: "Muy difícil"
+        }
+
+    ];
+
+
+    // =========================================================
+    // PREMIOS
+    // =========================================================
+
+    const prizes = [
+        5000,
+        10000,
+        20000,
+        30000,
+        40000,
+        60000,
+        80000,
+        100000,
+        150000,
+        200000,
+        250000,
+        300000,
+        350000,
+        400000,
+        500000,
+        600000,
+        700000,
+        800000,
+        900000,
+        1000000
+    ];
+
+
+    // =========================================================
+    // VARIABLES
+    // =========================================================
+
+    let currentQuestion = 0;
+    let money = 0;
+    let gameOver = false;
+
+
+    // =========================================================
+    // ELEMENTOS HTML
+    // =========================================================
+
+    const startScreen = document.getElementById("startScreen");
+    const gameScreen = document.getElementById("gameScreen");
+    const endScreen = document.getElementById("endScreen");
+
+    const questionElement = document.getElementById("question");
+    const answersElement = document.getElementById("answers");
+    const questionNumberElement = document.getElementById("questionNumber");
+    const difficultyElement = document.getElementById("difficulty");
+
+    const endTitle = document.getElementById("endTitle");
+    const endMessage = document.getElementById("endMessage");
+    const finalMoney = document.getElementById("finalMoney");
+
+
+    // =========================================================
+    // INICIAR JUEGO
+    // =========================================================
+
+    function startGame() {
+
+        currentQuestion = 0;
+        money = 0;
+        gameOver = false;
+
+        startScreen.classList.add("hidden");
+        endScreen.classList.add("hidden");
+        gameScreen.classList.remove("hidden");
+
+        loadQuestion();
+    }
+
+
+    // =========================================================
+    // CARGAR PREGUNTA
+    // =========================================================
+
+    function loadQuestion() {
+
+        if (currentQuestion >= questions.length) {
+            winGame();
+            return;
+        }
+
+        const q = questions[currentQuestion];
+
+        questionNumberElement.textContent = currentQuestion + 1;
+        questionElement.textContent = q.question;
+        difficultyElement.textContent = q.difficulty;
+
+        answersElement.innerHTML = "";
+
+        q.answers.forEach((answer, index) => {
+
+            const button = document.createElement("button");
+
+            button.classList.add("answer");
+
+            button.innerHTML =
+                String.fromCharCode(65 + index) + ") " + answer;
+
+            button.onclick = function () {
+                checkAnswer(index, button);
+            };
+
+            answersElement.appendChild(button);
+        });
+
+        updatePrizeList();
+    }
+
+
+    // =========================================================
+    // COMPROBAR RESPUESTA
+    // =========================================================
+
+    function checkAnswer(selected, selectedButton) {
+
+        if (gameOver) return;
+
+        const q = questions[currentQuestion];
+
+        const buttons = document.querySelectorAll(".answer");
+
+        buttons.forEach(button => {
+            button.disabled = true;
+        });
+
+
+        if (selected === q.correct) {
+
+            selectedButton.classList.add("correct");
+
+            money = prizes[currentQuestion];
+
+            setTimeout(() => {
+
+                currentQuestion++;
+
+                if (currentQuestion >= questions.length) {
+                    winGame();
+                } else {
+                    loadQuestion();
+                }
+
+            }, 1200);
+
+        } else {
+
+            selectedButton.classList.add("incorrect");
+
+            buttons[q.correct].classList.add("correct");
+
+            gameOver = true;
+
+            setTimeout(() => {
+                loseGame();
+            }, 1500);
+        }
+    }
+
+
+    // =========================================================
+    // ACTUALIZAR ESCALA DE PREMIOS
+    // =========================================================
+
+    function updatePrizeList() {
+
+        const items = document.querySelectorAll(".money-list li");
+
+        items.forEach(item => {
+
+            const level = Number(item.dataset.level);
+
+            item.classList.remove("current");
+            item.classList.remove("completed");
+
+            if (level === currentQuestion + 1) {
+                item.classList.add("current");
+            }
+
+            if (level <= currentQuestion) {
+                item.classList.add("completed");
+            }
+        });
+    }
+
+
+    // =========================================================
+    // RETIRARSE
+    // =========================================================
+
+    function retire() {
+
+        if (gameOver) return;
+
+        const confirmRetire = confirm(
+            "¿Seguro que quieres retirarte con $" +
+            money.toLocaleString("es-CO") +
+            "?"
+        );
+
+        if (confirmRetire) {
+
+            gameOver = true;
+
+            endTitle.textContent = "¡Te has retirado!";
+            endMessage.textContent =
+                "Decidiste asegurar tu dinero antes de continuar.";
+
+            finalMoney.textContent =
+                money.toLocaleString("es-CO");
+
+            gameScreen.classList.add("hidden");
+            endScreen.classList.remove("hidden");
+        }
+    }
+
+
+    // =========================================================
+    // PERDER
+    // =========================================================
+
+    function loseGame() {
+
+        gameScreen.classList.add("hidden");
+        endScreen.classList.remove("hidden");
+
+        endTitle.textContent = "💥 ¡Has perdido!";
+
+        endMessage.textContent =
+            "La respuesta era incorrecta. Como decidiste continuar, perdiste todo el dinero acumulado.";
+
+        finalMoney.textContent = "0";
+    }
+
+
+    // =========================================================
+    // GANAR
+    // =========================================================
+
+    function winGame() {
+
+        gameOver = true;
+
+        gameScreen.classList.add("hidden");
+        endScreen.classList.remove("hidden");
+
+        endTitle.textContent = "🏆 ¡FELICIDADES!";
+
+        endMessage.textContent =
+            "¡Has respondido correctamente las 20 preguntas y te has convertido en millonario!";
+
+        finalMoney.textContent =
+            prizes[19].toLocaleString("es-CO");
+    }
+
+
+    // =========================================================
+    // REINICIAR
+    // =========================================================
+
+    function restartGame() {
+        endScreen.classList.add("hidden");
+        startScreen.classList.remove("hidden");
+    }
+
+</script>
+
+</body>
+</html>
